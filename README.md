@@ -46,8 +46,7 @@ Traditional AI agents are **long-lived**, **context-heavy**, and **slow**.
 
 Swarm Rush agents are **disposable**, **low-context**, and **fast**.
 
-> 💡 Think of it like a hive: thousands of simple workers, each doing one
->     small task, dying quickly, replaced instantly.
+> 💡 Think of it like a hive: thousands of simple workers, each doing one small task, dying quickly, replaced instantly.
 
 ### The Problem
 
