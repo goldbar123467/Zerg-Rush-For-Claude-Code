@@ -460,6 +460,37 @@ python SWARM/SCRIPTS/swarm.py collect   # Process INBOX → STATE
 
 ---
 
+## MCP Server
+
+Zerg Swarm includes an MCP server for programmatic swarm control.
+
+### Installation
+
+```bash
+cd /home/ubuntu/projects/zerg-swarm
+pip install -e .
+```
+
+### Running
+
+```bash
+python -m zerg_swarm_mcp
+# Server starts on http://127.0.0.1:8766
+```
+
+### Key Tools
+
+| Tool | Description |
+|------|-------------|
+| `swarm_status` | Get current swarm state |
+| `task_list` | List tasks by lane |
+| `zergling_register` | Register active zergling |
+| `lock_acquire` | Reserve files |
+| `wave_increment` | Advance wave counter |
+| `health_check` | System diagnostics |
+
+---
+
 ## Philosophy
 
 > *"Quality is not in the individual worker, but in the rhythm of the swarm."*

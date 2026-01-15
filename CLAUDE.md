@@ -90,6 +90,43 @@ feedback: memory_id=123, helpful=true
 
 ---
 
+## MCP Server
+
+The Zerg Swarm MCP Server provides programmatic access to swarm coordination.
+
+### Starting the Server
+```bash
+cd /home/ubuntu/projects/zerg-swarm
+pip install -e .
+python -m zerg_swarm_mcp
+# Server starts on http://127.0.0.1:8766
+```
+
+### Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `swarm_status` | Get current swarm state |
+| `swarm_reset` | Reset state to initial values |
+| `task_list` | List tasks by lane |
+| `task_get` | Read a task card |
+| `task_create` | Create new task card |
+| `zergling_register` | Register active zergling |
+| `zergling_unregister` | Remove zergling |
+| `lock_acquire` | Reserve files for editing |
+| `lock_release` | Release file locks |
+| `wave_status` | Get wave statistics |
+| `wave_increment` | Advance wave counter |
+| `health_check` | System diagnostics |
+
+### Configuration
+Server runs on `http://127.0.0.1:8766` by default. Override with environment variables:
+- `ZERG_HOST` - Server host (default: 127.0.0.1)
+- `ZERG_PORT` - Server port (default: 8766)
+- `ZERG_SWARM_ROOT` - Path to SWARM directory
+
+---
+
 ## File Locking Protocol
 
 Before editing ANY file:
