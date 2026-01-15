@@ -16,9 +16,11 @@
 ### 2. Create Task Cards
 Place in correct lane directory:
 ```
-TASKS/KERNEL/T001.md
-TASKS/ML/T002.md
-TASKS/QUANT/T003.md
+TASKS/KERNEL/K001.md
+TASKS/ML/M001.md
+TASKS/QUANT/Q001.md
+TASKS/DEX/D001.md
+TASKS/INTEGRATION/INT-001.md
 ```
 
 ### 3. Spawn Zerglings
@@ -86,15 +88,29 @@ Gate fails? Report **PARTIAL**, note which check failed.
 
 ## Task Naming Convention
 
+Task ID format by lane:
 ```
-TASKS/<LANE>/T<NNN>.md
-INBOX/T<NNN>_RESULT.md
+KERNEL:      K001, K002, K003, ...
+ML:          M001, M002, M003, ...
+QUANT:       Q001, Q002, Q003, ...
+DEX:         D001, D002, D003, ...
+INTEGRATION: INT-001, INT-002, INT-003, ...
+DOC:         DOC-001, DOC-002, DOC-003, ...
+META:        META-001, META-002, META-003, ...
+```
+
+File paths:
+```
+TASKS/<LANE>/<ID>.md
+INBOX/<ID>_RESULT.md
 ```
 
 Examples:
-- TASKS/KERNEL/T001.md
-- TASKS/ML/T002.md
-- INBOX/T001_RESULT.md
+- TASKS/KERNEL/K001.md
+- TASKS/ML/M002.md
+- TASKS/INTEGRATION/INT-001.md
+- INBOX/K001_RESULT.md
+- INBOX/INT-001_RESULT.md
 
 ## Emergency Commands
 

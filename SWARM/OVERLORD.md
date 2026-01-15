@@ -52,26 +52,16 @@ WAVE-2: PENDING → SPAWNING → ACTIVE → COMPLETE
 
 ### 3. STATE.json Maintenance
 
-**Location**: `/home/ubuntu/projects/zerg-swarm/STATE.json`
+**Location**: `/home/ubuntu/projects/zerg-swarm/SWARM/STATE.json`
 
 **Structure**:
 ```json
 {
-  "active_wave": "WAVE-1",
-  "waves": {
-    "WAVE-1": {
-      "status": "ACTIVE",
-      "zerglings": ["ZERGLING-1", "ZERGLING-2", "ZERGLING-3"],
-      "tasks": ["task-001", "task-002", "task-003"],
-      "started": "2026-01-15T19:45:00Z"
-    }
-  },
-  "pending_tasks": ["task-004", "task-005"],
-  "completed_tasks": ["task-000"],
-  "file_reservations": {
-    "src/main.py": "ZERGLING-1",
-    "src/utils.py": "ZERGLING-2"
-  }
+  "wave": 0,
+  "active_zerglings": [],
+  "completed_tasks": [],
+  "pending_tasks": [],
+  "last_updated": "<timestamp>"
 }
 ```
 

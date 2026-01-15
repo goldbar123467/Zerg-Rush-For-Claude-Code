@@ -61,6 +61,35 @@ If limits are exceeded, return **PARTIAL**.
 
 ---
 
+## RAG Brain Protocol
+
+Every agent session SHOULD use RAG Brain for shared memory:
+
+1. **On spawn**: `mcp__rag-brain__recall` - Retrieve prior context and decisions
+2. **On complete**: `mcp__rag-brain__remember` - Store important decisions and outcomes
+3. **Always**: `mcp__rag-brain__feedback` - Provide feedback on useful memories
+
+### Usage Examples
+
+```
+# Recall context before starting work
+recall: "zerg-swarm architecture decisions"
+
+# Remember a decision made
+remember: "Chose atomic write pattern for STATE.json to prevent corruption"
+
+# Provide feedback on a memory that was helpful
+feedback: memory_id=123, helpful=true
+```
+
+### When to Use
+
+- **recall**: At session start, before major decisions
+- **remember**: After completing tasks, making architectural decisions
+- **feedback**: When a recalled memory helped (or didn't)
+
+---
+
 ## File Locking Protocol
 
 Before editing ANY file:
@@ -80,7 +109,7 @@ Before editing ANY file:
 All tasks live in `/SWARM/TASKS/` and follow this structure:
 
 ```markdown
-# Task: [TASK_ID]
+# Task: [LANE_PREFIX-NNN]
 
 ## Metadata
 - Wave: X
@@ -101,6 +130,24 @@ Single-sentence goal.
 ## Constraints
 - Max 100 lines
 - Max 2 files
+```
+
+### Task ID Naming Convention
+
+Task IDs use lane-specific prefixes:
+- **KERNEL lane**: K001, K002, K003, ...
+- **ML lane**: M001, M002, M003, ...
+- **QUANT lane**: Q001, Q002, Q003, ...
+- **DEX lane**: D001, D002, D003, ...
+- **INTEGRATION lane**: INT-001, INT-002, INT-003, ...
+- **DOC lane**: DOC-001, DOC-002, DOC-003, ...
+- **META lane**: META-001, META-002, META-003, ...
+
+File locations:
+```
+TASKS/KERNEL/K001.md → INBOX/K001_RESULT.md
+TASKS/ML/M001.md → INBOX/M001_RESULT.md
+TASKS/INTEGRATION/INT-001.md → INBOX/INT-001_RESULT.md
 ```
 
 ---
@@ -191,6 +238,7 @@ Every task has a **Type** that guarantees 4-min / 100-line fit.
 
 ### Task Card Header
 ```
+Task ID: K001
 Lane: KERNEL
 Type: ADD_PURE_FN
 ```
