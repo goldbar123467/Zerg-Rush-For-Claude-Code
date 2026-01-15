@@ -1,0 +1,20 @@
+{
+  "wave": 0,
+  "active_zerglings": [],
+  "completed_tasks": [],
+  "pending_tasks": [
+    "KERNEL/K001",
+    "KERNEL/K002",
+    "KERNEL/K003",
+    "ML/M001",
+    "ML/M002",
+    "ML/M003",
+    "QUANT/Q001",
+    "QUANT/Q002",
+    "QUANT/Q003",
+    "DEX/D001",
+    "DEX/D002",
+    "DEX/D003"
+  ],
+  "last_updated": "2026-01-15T20:15:00Z"
+}
