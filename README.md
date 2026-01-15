@@ -109,86 +109,166 @@ Swarm Rush agents are **disposable**, **low-context**, and **fast**.
 ### Project Structure
 
 ```mermaid
-graph TD
-    subgraph SWARM["📁 SWARM/"]
-        STATE["STATE.json"]
-        RULES["SWARM_RULES.md"]
-        GATES["GATES.md"]
-        PROMPTS["PROMPTS.md"]
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#6b21a8', 'primaryTextColor': '#fff', 'primaryBorderColor': '#9333ea', 'lineColor': '#a855f7', 'secondaryColor': '#1e1b4b', 'tertiaryColor': '#312e81'}}}%%
+flowchart TD
+    subgraph SWARM["🐝 SWARM/"]
+        direction TB
+        STATE[("⚡ STATE.json")]
+        RULES["📜 SWARM_RULES.md"]
+        GATES["🚪 GATES.md"]
+        PROMPTS["💬 PROMPTS.md"]
+        RUNBOOK["📖 RUNBOOK.md"]
 
-        subgraph TASKS["📁 TASKS/"]
-            KERNEL["🔥 KERNEL/"]
-            ML["🧠 ML/"]
-            QUANT["📊 QUANT/"]
-            DEX["💱 DEX/"]
-            INT["🔗 INTEGRATION/"]
+        subgraph LANES["🛤️ TASK LANES"]
+            direction LR
+            KERNEL["🔥 KERNEL"]
+            ML["🧠 ML"]
+            QUANT["📊 QUANT"]
+            DEX["💱 DEX"]
+            INT["🔗 INTEGRATION"]
         end
 
-        subgraph IO["📁 I/O"]
-            INBOX["📥 INBOX/"]
-            OUTBOX["📤 OUTBOX/"]
+        subgraph FLOW["📨 MESSAGE FLOW"]
+            direction LR
+            OUTBOX["📤 OUTBOX"]
+            INBOX["📥 INBOX"]
         end
 
-        TEMPLATES["📁 TEMPLATES/"]
-        SCRIPTS["📁 SCRIPTS/"]
+        SCRIPTS["⚙️ SCRIPTS/"]
         LOCKS["🔒 LOCKS/"]
     end
 
-    STATE --> TASKS
-    TASKS --> IO
+    STATE --> LANES
+    LANES --> FLOW
+    OUTBOX -->|"assign"| INBOX
+    INBOX -->|"collect"| STATE
+
+    style STATE fill:#6b21a8,stroke:#a855f7,stroke-width:3px
+    style LANES fill:#1e1b4b,stroke:#4f46e5
+    style FLOW fill:#312e81,stroke:#6366f1
 ```
 
 ### Wave Execution Flow
 
 ```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'actorBkg': '#6b21a8', 'actorTextColor': '#fff', 'actorLineColor': '#a855f7', 'signalColor': '#22c55e', 'signalTextColor': '#fff'}}}%%
 sequenceDiagram
-    participant O as 👁️ Overlord
-    participant T as 📋 Task Queue
+    autonumber
+    participant O as 👁️ OVERLORD
+    participant Q as 📋 QUEUE
     participant W1 as 🐝 Worker 1
     participant W2 as 🐝 Worker 2
     participant W3 as 🐝 Worker 3
-    participant I as 📥 Inbox
+    participant W4 as 🐝 Worker 4
+    participant W5 as 🐝 Worker 5
+    participant I as 📥 INBOX
 
-    O->>T: Decompose goal into microtasks
-    O->>T: Compose wave (5 tasks)
-
-    par Parallel Execution
-        T->>W1: Assign K001
-        T->>W2: Assign K002
-        T->>W3: Assign K003
+    rect rgb(30, 27, 75)
+        Note over O,Q: 📝 WAVE COMPOSITION
+        O->>Q: Decompose goal → 5 microtasks
+        O->>Q: Validate: 2 impl + 2 test + 1 quality
     end
 
-    W1->>I: DONE ✓
-    W2->>I: PARTIAL ⚠️
-    W3->>I: DONE ✓
+    rect rgb(49, 46, 129)
+        Note over Q,W5: ⚡ PARALLEL SPAWN (4 min TTL)
+        par
+            Q->>W1: K001 [ADD_PURE_FN]
+            Q->>W2: K002 [ADD_TEST]
+            Q->>W3: K003 [ADD_BENCH]
+            Q->>W4: M001 [ADD_STUB]
+            Q->>W5: M002 [ADD_TEST]
+        end
+    end
 
-    Note over W1,W3: Workers terminate after reporting
+    rect rgb(22, 78, 99)
+        Note over W1,I: 📤 RESULTS
+        W1->>I: ✅ DONE
+        W2->>I: ✅ DONE
+        W3->>I: ⚠️ PARTIAL
+        W4->>I: ✅ DONE
+        W5->>I: 🚫 BLOCKED
+    end
 
-    I->>O: Collect results
-    O->>T: Create follow-up for PARTIAL
-    O->>O: Next wave...
+    Note over W1,W5: 💀 ALL WORKERS TERMINATE
+
+    rect rgb(30, 27, 75)
+        Note over I,O: 🔄 COLLECT & ITERATE
+        I->>O: Merge 3 DONE results
+        O->>Q: Split PARTIAL → 2 new tasks
+        O->>Q: Resolve BLOCKED dependency
+        O->>O: Wave 2...
+    end
 ```
 
 ### Worker Lifecycle
 
 ```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#6b21a8', 'lineColor': '#a855f7'}}}%%
 stateDiagram-v2
-    [*] --> Spawn: New wave
-    Spawn --> Register: Get assignment
-    Register --> Lock: Reserve files
-    Lock --> Execute: 4-min timer starts
-    Execute --> Report: Task complete
-    Execute --> Report: Time limit hit
-    Execute --> Report: Blocked
-    Report --> Release: Free locks
-    Release --> Die: Terminate
-    Die --> [*]
+    direction LR
 
-    note right of Execute
-        Max 4 minutes
-        Max 100 lines
-        Max 2 files
+    [*] --> 🥚Spawn: New Wave
+
+    state "🐝 ACTIVE" as active {
+        🥚Spawn --> 📋Register: Get task card
+        📋Register --> 🔒Lock: Reserve files
+        🔒Lock --> ⚡Execute: Start 4-min timer
+
+        state ⚡Execute {
+            direction TB
+            [*] --> Working
+            Working --> Working: Loop
+            Working --> ✅Done: Complete
+            Working --> ⚠️Partial: Time/lines exceeded
+            Working --> 🚫Blocked: Need more context
+        }
+    }
+
+    ⚡Execute --> 📤Report: Write result
+    📤Report --> 🔓Release: Free locks
+    🔓Release --> 💀Die: Terminate
+    💀Die --> [*]
+
+    note right of ⚡Execute
+        ⏱️ 4 min max
+        📏 100 lines max
+        📁 2 files max
     end note
+
+    note right of 💀Die
+        No state preserved
+        Fresh spawn next wave
+    end note
+```
+
+### Lane Isolation
+
+```mermaid
+%%{init: {'theme': 'dark'}}%%
+flowchart LR
+    subgraph WAVE["🌊 WAVE 1"]
+        direction TB
+
+        subgraph KERNEL_LANE["🔥 KERNEL LANE"]
+            K1["K001<br/>ADD_PURE_FN"]
+            K2["K002<br/>ADD_TEST"]
+            K3["K003<br/>ADD_BENCH"]
+        end
+
+        subgraph ML_LANE["🧠 ML LANE"]
+            M1["M001<br/>ADD_STUB"]
+            M2["M002<br/>ADD_TEST"]
+        end
+    end
+
+    K1 -.->|"❌ NO CROSS"| M1
+
+    OVERLORD["👁️ OVERLORD"] --> WAVE
+    WAVE --> RESULTS["📥 RESULTS"]
+
+    style KERNEL_LANE fill:#7c2d12,stroke:#ea580c
+    style ML_LANE fill:#1e3a8a,stroke:#3b82f6
+    style WAVE fill:#1e1b4b,stroke:#6366f1
 ```
 
 ---
