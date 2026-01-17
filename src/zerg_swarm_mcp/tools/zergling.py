@@ -3,6 +3,7 @@
 from datetime import datetime
 from fastmcp import Context
 from ..server import mcp
+from ..flavor import spawn, death
 from .state import _load_state, _save_state
 
 
@@ -10,12 +11,12 @@ from .state import _load_state, _save_state
 async def zergling_register(ctx: Context, name: str) -> dict:
     """Register an active zergling with the swarm."""
     state = _load_state()
-    
+
     # Check if already registered
     for z in state["active_zerglings"]:
         if z.get("name") == name:
             return {"status": "already_registered", "zergling": z}
-    
+
     entry = {
         "name": name,
         "registered": datetime.now().isoformat(),
@@ -23,25 +24,30 @@ async def zergling_register(ctx: Context, name: str) -> dict:
     }
     state["active_zerglings"].append(entry)
     _save_state(state)
-    
-    return {"status": "registered", "zergling": entry}
+
+    # Emit spawn voiceline
+    voiceline = spawn(name)
+
+    return {"status": "registered", "zergling": entry, "voiceline": voiceline}
 
 
 @mcp.tool(name="zergling_unregister", description="Unregister a zergling")
 async def zergling_unregister(ctx: Context, name: str) -> dict:
     """Remove a zergling from active list."""
     state = _load_state()
-    
+
     original_count = len(state["active_zerglings"])
     state["active_zerglings"] = [
-        z for z in state["active_zerglings"] 
+        z for z in state["active_zerglings"]
         if z.get("name") != name
     ]
-    
+
     if len(state["active_zerglings"]) < original_count:
         _save_state(state)
-        return {"status": "unregistered", "name": name}
-    
+        # Emit death voiceline
+        voiceline = death(name)
+        return {"status": "unregistered", "name": name, "voiceline": voiceline}
+
     return {"status": "not_found", "name": name}
 
 

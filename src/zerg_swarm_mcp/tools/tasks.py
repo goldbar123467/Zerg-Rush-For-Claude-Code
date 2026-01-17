@@ -4,6 +4,7 @@ from pathlib import Path
 from fastmcp import Context
 from ..server import mcp
 from ..config import settings
+from ..flavor import blocked, emit, SwarmEvent
 
 TASKS_DIR = settings.swarm_root / "TASKS"
 LANES = ["KERNEL", "ML", "QUANT", "DEX", "INTEGRATION"]
@@ -82,4 +83,32 @@ async def task_create(
 - Max 2 files
 """
     task_file.write_text(content)
-    return {"status": "created", "path": str(task_file)}
+
+    # Emit queen directive voiceline
+    voiceline = emit(SwarmEvent.QUEEN_DIRECTIVE, "[QUEEN]")
+
+    return {"status": "created", "path": str(task_file), "voiceline": voiceline}
+
+
+@mcp.tool(name="task_block", description="Mark a task as blocked")
+async def task_block(ctx: Context, task_id: str, lane: str, reason: str) -> dict:
+    """Mark a task as blocked with a reason."""
+    task_file = TASKS_DIR / lane / f"{task_id}.md"
+    if not task_file.exists():
+        return {"error": f"Task {lane}/{task_id} not found"}
+
+    content = task_file.read_text()
+    # Update status in content
+    content = content.replace("| Status | PENDING |", "| Status | BLOCKED |")
+    content = content.replace("| Status | IN_PROGRESS |", "| Status | BLOCKED |")
+
+    # Add blocker section if not present
+    if "## Blocker" not in content:
+        content += f"\n## Blocker\n{reason}\n"
+
+    task_file.write_text(content)
+
+    # Emit blocked voiceline
+    voiceline = blocked()
+
+    return {"status": "blocked", "task_id": task_id, "reason": reason, "voiceline": voiceline}

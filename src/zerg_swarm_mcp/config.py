@@ -13,5 +13,15 @@ class Settings(BaseSettings):
     host: str = "127.0.0.1"
     port: int = 8766
 
+    # Flavor text settings
+    verbose: bool = True  # Enable flavor text output
+    serious_mode: bool = False  # Disable all flavor text (for demos/investors)
+
 
 settings = Settings()
+
+
+def init_flavor_config() -> None:
+    """Initialize flavor text system from settings."""
+    from . import flavor
+    flavor.configure(verbose=settings.verbose, serious_mode=settings.serious_mode)

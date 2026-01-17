@@ -6,6 +6,7 @@ from pathlib import Path
 from fastmcp import Context
 from ..server import mcp
 from ..config import settings
+from ..flavor import SwarmEvent, emit
 
 LOCKS_DIR = settings.swarm_root / "LOCKS"
 
@@ -18,16 +19,16 @@ def _get_lock_file(path: str) -> Path:
 
 @mcp.tool(name="lock_acquire", description="Acquire lock on files")
 async def lock_acquire(
-    ctx: Context, 
-    paths: list[str], 
-    holder: str, 
+    ctx: Context,
+    paths: list[str],
+    holder: str,
     ttl: int = 300
 ) -> dict:
     """Reserve files for exclusive editing."""
     LOCKS_DIR.mkdir(exist_ok=True)
     acquired = []
     failed = []
-    
+
     for path in paths:
         lock_file = _get_lock_file(path)
         if lock_file.exists():
@@ -36,7 +37,7 @@ async def lock_acquire(
             if datetime.fromisoformat(data["expires"]) > datetime.now():
                 failed.append({"path": path, "holder": data["holder"]})
                 continue
-        
+
         # Create lock
         expires = datetime.now() + timedelta(seconds=ttl)
         lock_data = {
@@ -47,8 +48,15 @@ async def lock_acquire(
         }
         lock_file.write_text(json.dumps(lock_data, indent=2))
         acquired.append(path)
-    
-    return {"acquired": acquired, "failed": failed}
+
+    # Emit appropriate voiceline
+    voiceline = ""
+    if failed:
+        voiceline = emit(SwarmEvent.LOCK_CONFLICT, f"[LOCK:{holder}]")
+    elif acquired:
+        voiceline = emit(SwarmEvent.LOCK_ACQUIRED, f"[LOCK:{holder}]")
+
+    return {"acquired": acquired, "failed": failed, "voiceline": voiceline}
 
 
 @mcp.tool(name="lock_release", description="Release file locks")
