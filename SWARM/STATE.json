@@ -1,6 +1,12 @@
 {
-  "wave": 0,
-  "active_zerglings": [],
+  "wave": 1,
+  "active_zerglings": [
+    {
+      "name": "claude-opus",
+      "registered": "2026-01-17T01:56:51.277053",
+      "wave": 0
+    }
+  ],
   "completed_tasks": [],
   "pending_tasks": [
     "KERNEL/K001",
@@ -16,5 +22,5 @@
     "DEX/D002",
     "DEX/D003"
   ],
-  "last_updated": "2026-01-15T20:15:00Z"
+  "last_updated": "2026-01-17T01:59:50.972392"
 }

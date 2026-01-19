@@ -1,0 +1,6 @@
+#!/bin/bash
+# Orson CLI Launcher
+# Usage: ./orson or ./orson server
+
+cd /home/ubuntu/projects/zerg-swarm
+python3 -m src.orson "$@"

@@ -11,7 +11,7 @@ class Settings(BaseSettings):
 
     swarm_root: Path = Path("/home/ubuntu/projects/zerg-swarm/SWARM")
     host: str = "127.0.0.1"
-    port: int = 8766
+    port: int = 8767
 
     # Flavor text settings
     verbose: bool = True  # Enable flavor text output

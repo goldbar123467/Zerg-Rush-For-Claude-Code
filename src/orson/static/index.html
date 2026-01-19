@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orson - Agent IDE</title>
+    <link rel="stylesheet" href="/static/css/orson.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Sky & Horizon -->
+        <div id="sky">
+            <div class="cloud" style="left: 10%; animation-delay: 0s;"></div>
+            <div class="cloud" style="left: 40%; animation-delay: 3s;"></div>
+            <div class="cloud" style="left: 70%; animation-delay: 6s;"></div>
+            <div id="water-tower">
+                <div class="tower-tank">ORSON</div>
+                <div class="tower-legs"></div>
+            </div>
+        </div>
+
+        <!-- Distant treeline -->
+        <div id="horizon">
+            <div class="tree"></div>
+            <div class="barn"></div>
+            <div class="tree"></div>
+            <div class="silo-distant"></div>
+            <div class="tree"></div>
+            <div class="tree"></div>
+            <div class="tree"></div>
+        </div>
+
+        <!-- Main town canvas -->
+        <div id="town-container">
+            <div id="cornfield-left" class="cornfield"></div>
+            <canvas id="town-canvas" width="800" height="500"></canvas>
+            <div id="cornfield-right" class="cornfield"></div>
+        </div>
+
+        <!-- Status Bar -->
+        <div id="status-bar">
+            <div class="status-item">
+                <span class="label">WAVE</span>
+                <span id="wave-num" class="value">0</span>
+            </div>
+            <div class="status-item">
+                <span class="label">WORKERS</span>
+                <span id="worker-count" class="value">0</span>
+            </div>
+            <div class="status-item">
+                <span class="label">PENDING</span>
+                <span id="pending-count" class="value">0</span>
+            </div>
+            <div class="status-item">
+                <span class="label">COMPLETED</span>
+                <span id="completed-count" class="value">0</span>
+            </div>
+            <div class="status-item health">
+                <span class="label">HEALTH</span>
+                <span id="health-indicator" class="value indicator">●</span>
+            </div>
+        </div>
+
+        <!-- Worker Panel (bottom) -->
+        <div id="worker-panel">
+            <div class="panel-header">
+                <h3>🐛 ACTIVE WORKERS</h3>
+                <div class="panel-actions">
+                    <button id="btn-collect" class="btn">📬 Collect</button>
+                    <button id="btn-next-wave" class="btn btn-primary">🌊 Next Wave</button>
+                </div>
+            </div>
+            <div id="worker-list">
+                <!-- Workers populated by JS -->
+                <div class="worker-placeholder">No active workers. Spawn a wave to begin.</div>
+            </div>
+            <div id="voiceline-ticker">
+                <span class="ticker-text">Welcome to Orson. The Mayor would like a word about your task decomposition.</span>
+            </div>
+        </div>
+
+        <!-- Building Info Panel (right sidebar, hidden by default) -->
+        <div id="building-panel" class="panel-hidden">
+            <div class="panel-header">
+                <h3 id="building-title">Building</h3>
+                <button id="btn-close-panel" class="btn-close">×</button>
+            </div>
+            <div id="building-content">
+                <!-- Task list populated by JS -->
+            </div>
+        </div>
+
+        <!-- Connection Status Overlay -->
+        <div id="connection-overlay" class="overlay-hidden">
+            <div class="overlay-content">
+                <div class="spinner"></div>
+                <p>Connecting to MCP Server...</p>
+                <p class="overlay-hint">Make sure zerg-swarm-mcp is running on port 8766</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts (ES Modules) -->
+    <script type="module" src="/static/js/app.js"></script>
+</body>
+</html>
